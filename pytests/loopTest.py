@@ -16,3 +16,15 @@ for i in range(0, 10, 2):
 
 for i in range(0, -10, -2):
     print i
+
+for i in range(10):
+    i = i+1
+    print i
+
+for i in range(10):
+    if i%2 == 0:
+        continue
+
+for i in range(10):
+    if i == 5:
+        break
