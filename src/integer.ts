@@ -2,13 +2,18 @@ import gLong = require("../lib/gLong");
 import singletons = require('./singletons');
 var NIError = singletons.NotImplemented;
 import Py_Float = require('./float');
+import pytypes = require('./pytypes');
 
 // Py_Int represents the Python Integer class. Integers are marshalled as 32 and
 // 64 bit integers, but they are handled as 64 bit ints. This class follows the
 // latter design by quietly handling the small ints.
-class Py_Int {
-    isInt: boolean = true;
-    constructor(public value: gLong) {}
+class Py_Int extends pytypes.Py_Object {
+    private isInt: boolean = true;
+    private value: gLong;
+    constructor(val: gLong) {
+        super();
+        this.value = val;
+    }
 
     // Integers are the narrowest of the numeric types. fromInt is a convenient
     // function for quickly making Py_Ints from JavaScript numbers.
@@ -84,18 +89,13 @@ class Py_Int {
     mod(other: any): any {
         return this.mathOp(other, function(a, b) {
             if (b.value.isZero())
-                throw new Error("Modulos by 0 is not allowed");
-            // return new Py_Int(a.value.modulo(b.value));
-            console.log("MOD: ", a, b);
-            console.log("FLOORDIV: ", a.floordiv(b));
+                throw new Error("Modulo by 0 is not allowed");
             return a.sub(b.mult(a.floordiv(b)));
         });
     }
 
     divmod(other: any): any {
-        return this.mathOp(other, function(a, b) {
-            return a.div(b).mod(b);
-        });
+        return [this.floordiv(other), this.mod(other)];
     }
 
     // gLong, the underlying type for Py_Int, doesn't have a power function.
